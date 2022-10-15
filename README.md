@@ -13,4 +13,4 @@ Data grabbed for each company:
   - MACD
   - Weekly_Price
 
-set to iterate every minute for api restriction. 
+set to iterate 5 times every minute for api restriction. 
