@@ -1,7 +1,7 @@
 # finance_api
-Simple finance tool. Grabs all avalable data on top 50 of the top 500 companies.
+Simple finance tool. Grabs all avalable data on top 50 of the top 500 companies. [Main code](finance_api.py)
 
-APPL.csv is an example of output.
+[APPL](APPL.csv) is an example of output.
 
 Data grabbed for each company:
   - EMA_Short
