@@ -12,3 +12,5 @@ Data grabbed for each company:
   - OBV
   - MACD
   - Weekly_Price
+
+set to iterate every minute for api restriction. 
