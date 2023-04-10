@@ -78,3 +78,18 @@ def call(symb):
     url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={symb}&apikey={key.API_KEY}'
     r = requests.get(url)
     return r.json()
+
+
+def tops(data,n):
+    '''
+        using the dictinary from scores call
+        returns the top n scores, i.e. highest bull prediction
+    '''
+    import itertools as it
+
+    sorted_data_dict = dict(sorted(data.items(), key=lambda item: item[1], reverse=True))
+    if n > len(sorted_data_dict)-1:
+        n = len(sorted_data_dict)-1
+    best_n = dict(it.islice(sorted_data_dict.items(),n))
+
+    return best_n

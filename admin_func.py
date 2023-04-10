@@ -1,25 +1,6 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from pandas.core.frame import DataFrame
-from pandas.core.indexes import period
-from six.moves import urllib
-
-import tensorflow as tf
-from tensorflow._api.v2 import feature_column
-from tensorflow.python.eager.def_function import _evaluate_var_is_initialized
-from tensorflow.python.feature_column.feature_column_v2 import NumericColumn
-import tensorflow.compat.v2.feature_column as fc
-
-
-def make_input_func(data_df, lable_df, epochs=10,batch_size=32):
-    def input_func():
-        ds = tf.data.Dataset.from_tensor_slices((dict(data_df),lable_df))
-        ds = ds.batch(batch_size).repeat(epochs)
-        return ds
-    return input_func
 
 
 def split_df(df):
@@ -73,9 +54,3 @@ def GET_SYMBOLS():
 
     return nasdq_symbol
 
-
-
-#deal = pd.read_csv("csv_files/AAPL.csv")
-
-#for col in deal.columns:
-#    print(col)
