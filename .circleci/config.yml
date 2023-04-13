@@ -31,6 +31,6 @@ jobs:
         command: python Utest.py
 
 workflows:
-  Main:
+  build-and-test:
     jobs:
       - build-and-test
