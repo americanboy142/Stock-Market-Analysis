@@ -36,9 +36,9 @@ jobs:
       - run: pip install --upgrade pip
       - run: pip install -r requirements.txt
       - run:
-          name: Run tests
+          name: Run Utests
           # This assumes pytest is installed via the install-package step above
-          command: pytest
+          command: unittest
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
