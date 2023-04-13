@@ -13,8 +13,8 @@ class Test(unittest.TestCase):
         self.test_data_news = pd.read_csv('csv_files/TEST_NEWS.csv')
         self.test_data_bal = pd.read_csv('csv_files/TEST_BAL.csv')
         self.test_data_in = pd.read_csv('csv_files/TEST_IN.csv')
-        self.test_df = pd.read_csv('csv_files\TEST_FUNCS.csv')
-        self.test_rsi = pd.read_csv('csv_files\TEST_RSI.csv')
+        self.test_df = pd.read_csv('csv_files/TEST_FUNCS.csv')
+        self.test_rsi = pd.read_csv('csv_files/TEST_RSI.csv')
 
         with open('json_files/TEST_NEWS.json', 'r') as f:
             self.test_news =  json.load(f)
