@@ -13,22 +13,20 @@ jobs:
       - checkout
       
       # check pip version
-      - run: 
-        name: upgrade-pip
-        command: pip install --upgrade pip
+      - run:
+          name: upgrade-pip
+          command: pip install --upgrade pip
 
       # install dependencies
-      - run: 
-        name: install-packages
-        command: 
-          python3 -m venv venv
-          . /venv/bin/activate
-          pip install -r requirements.txt
+      - run:
+          name: install-packages
+          command: pip install -r requirements.txt
 
       # main tests
-      - run: 
-        name: Utests
-        command: python Utest.py
+      - run:
+          name: Utests
+          command: python Utest.py
+
 
 workflows:
   build-and-test:
