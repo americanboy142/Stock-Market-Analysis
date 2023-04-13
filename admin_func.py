@@ -2,6 +2,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+def CSV_to_DATA(symb):
+    try:
+        return pd.read_csv(f'csv_files/{symb}.csv')
+    except FileNotFoundError:
+        raise Exception(f'File for {symb} does not exist')
+
+
 
 def split_df(df):
     '''

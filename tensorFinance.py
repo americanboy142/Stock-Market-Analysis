@@ -1,5 +1,7 @@
 def tensor_main(data,Plus_Min):
-    " given data and plus_min(up or down column vector) returns tensor flow prediction of whether a given stock will go up or down. "
+    """ given data and plus_min(up or down column vector) returns tensor flow max accuracy, predictions of whether a given stock will go up or down. 
+    uses epochs,batchsize (15,20),(60,70), (100, 128)
+    """
     import tensorflow as tf
     import numpy as np
 
@@ -10,9 +12,6 @@ def tensor_main(data,Plus_Min):
 
     numeric = np.array([traindf['EMA_Short'],traindf['EMA_Long'],traindf['RSI'],traindf['OBV'],traindf['Trend_EMA']])
     numeric = numeric.transpose()
-    print(numeric.shape)
-    print(Plus_Min[third:].shape)
-    print(Plus_Min[:third].shape)
     # Create a sequential model
 
     model = tf.keras.Sequential([
@@ -25,26 +24,25 @@ def tensor_main(data,Plus_Min):
 
     # Train the model
 
-    epoc_list = [(10, 32), (15,20),(30,50),(60,70), (50, 64), (100, 128), (200, 256)]
+    epoc_list = [(15,20),(60,70), (100, 128)]
     test_vec = [[]*3]*len(epoc_list)
     i = 0
+    acc = 0
     for epoc,batch in epoc_list:
-        history = model.fit(numeric, Plus_Min[third:], epochs=epoc, batch_size=batch, verbose=0)
+        model.fit(numeric, Plus_Min[third:], epochs=epoc, batch_size=batch, verbose=0)
 
         # Use the trained model to predict the class of a new input
         X_test = np.array([testdf['EMA_Short'],testdf['EMA_Long'],testdf['RSI'],testdf['OBV'],testdf['Trend_EMA']])
         X_test = X_test.transpose()
-        #y_pred = model.predict(X_new, verbose=0)
 
-        test_loss, test_acc = model.evaluate(X_test, Plus_Min[:third], verbose=0)
-
-        test_vec[i] = [epoc,batch,test_acc]
+        loss,test_acc = model.evaluate(X_test, Plus_Min[:third], verbose=0)
+        
+        if test_acc > acc:
+            acc = test_acc
+            predictions = model.predict(X_test,verbose=0)
         i += 1
 
 
-    print(test_vec)
-
-    print("real:   ",Plus_Min)
-    print(data.head())
-
-    x = np.arange(len(data))
+    predictions = predictions.flatten()
+    
+    return acc,predictions

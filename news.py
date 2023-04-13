@@ -1,9 +1,7 @@
 
-def news_to_table(data):
+def news_to_dict(data):
     """
-        Given a news api response as is and current news.json
-        will return updated dictionary, with most current news.
-        Problem : essentially delets and rebuilds news.json
+        Given a news api response as is will return updated dictionary, with most current news.
     """
     
     dict = {}
@@ -31,7 +29,7 @@ def news_to_table(data):
 
 def score(data,news_scores={}):
     '''
-        return the bear/bull scores of given data
+        return the bear/bull scores of given raw news data
         -1 => bear , 0 => nothing , 1 => bull
         only returns scores if number of articles is > 2
         sample call => news.score(data,curr_scores), data: News api call
@@ -41,11 +39,14 @@ def score(data,news_scores={}):
     import pandas as pd
     import numpy as np 
 
-    News = news_to_table(data)
+    News = news_to_dict(data)
     for symb in News:
-
+        
         News_df = pd.DataFrame()
-        if len(News[symb]) > 2:
+        #print(len(News[symb]))
+        length = sum(len(News[symb][date]) for date in News[symb])
+
+        if length > 2:
             for i in News[symb]:
                 temp = pd.DataFrame(News[symb][i])
                 dates = np.full(len(temp),i)
@@ -58,11 +59,10 @@ def score(data,news_scores={}):
 
             score_avg = sum(ticker_score)/len(News_df['ticker_sentiment_score'])
             if symb not in news_scores:
-                news_scores[symb] = score_avg
+                news_scores[symb] = score_avg.round(5)
             else:
-                news_scores[symb] = (news_scores[symb] + score_avg) / 2
+                news_scores[symb] = ((news_scores[symb] + score_avg) / 2).round(5)
             
-            news_scores[symb] = news_scores[symb].round(5)
 
     return(news_scores)
 
