@@ -12,17 +12,14 @@ def tensor_main(data,Plus_Min):
 
     numeric = np.array([traindf['EMA_Short'],traindf['EMA_Long'],traindf['RSI'],traindf['OBV'],traindf['Trend_EMA']])
     numeric = numeric.transpose()
-    # Create a sequential model
 
     model = tf.keras.Sequential([
         tf.keras.layers.Dense(10, input_shape=(5,), activation='relu'),
         tf.keras.layers.Dense(1, activation='sigmoid')
     ])
 
-    # Compile the model with binary cross-entropy loss and Adam optimizer
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-    # Train the model
 
     epoc_list = [(15,20),(60,70), (100, 128)]
     test_vec = [[]*3]*len(epoc_list)
@@ -31,7 +28,6 @@ def tensor_main(data,Plus_Min):
     for epoc,batch in epoc_list:
         model.fit(numeric, Plus_Min[third:], epochs=epoc, batch_size=batch, verbose=0)
 
-        # Use the trained model to predict the class of a new input
         X_test = np.array([testdf['EMA_Short'],testdf['EMA_Long'],testdf['RSI'],testdf['OBV'],testdf['Trend_EMA']])
         X_test = X_test.transpose()
 
