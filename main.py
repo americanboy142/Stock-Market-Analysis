@@ -23,7 +23,7 @@ print(non_tens_acc,non_tensor_predict[0])
 print(tens_acc ,tensor_predict[0])
 
 # ======================== NEWS =================================
-"""
+
 with open('json_files/news_main.json', 'r') as f:
     curr_news_scores = json.load(f)
  
@@ -51,8 +51,10 @@ with open('json_files/port.json', 'r') as f:
 port.news_check(curr_news_scores,portfol)
 
 
+
 """
-"""
+SET UP TEST DATA    
+
 df = pd.DataFrame({'EMA_DIFF': pn.calculate_EMA_difference(np.array(data["EMA_Short"]),np.array(data["EMA_Long"])),
                    'Plus_Min': pn.calculate_Puls_min(np.array(data['Weekly_Price']))
                    })
