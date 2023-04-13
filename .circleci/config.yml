@@ -11,9 +11,6 @@ jobs:
 
     steps:
       - checkout
-
-      - restore_cache:
-          key: v1-python-cache-{{ checksum "requirements.txt" }}
       
       # check pip version
       - run: 
