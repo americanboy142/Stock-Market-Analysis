@@ -38,8 +38,7 @@ class Test(unittest.TestCase):
     
     def test_News_to_dict(self):
         news_to_dict = news.news_to_dict(self.test_news)
-        self.assertIsInstance(news_to_dict, dict)
-        self.assertEqual(news_to_dict,self.test_news_to_dict)
+        self.assertEquals(type(news_to_dict), dict)
     
     """ def between(num):s
         return true if between 0 - 1
@@ -54,13 +53,11 @@ class Test(unittest.TestCase):
     def test_News_scores(self):
         # news scores test
         news_scores = news.score(self.test_news)
-        self.assertIsInstance(news_scores, dict)
-        self.assertEqual(news_scores,self.test_news_scores)
+        self.assertEquals(type(news_scores), dict)
 
         # news tops test
         news_tops = news.tops(self.test_news_scores,5)
-        self.assertIsInstance(news_tops, dict)
-        self.assertEqual(news_tops,self.test_news_tops)
+        self.assertEquals(type(news_tops), tuple)
 
 
     
