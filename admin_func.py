@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import json
 
 def CSV_to_DATA(symb):
     try:
@@ -8,7 +9,11 @@ def CSV_to_DATA(symb):
     except FileNotFoundError:
         raise Exception(f'File for {symb} does not exist')
 
-
+def search_news_scores(ticker):
+    with open('json_files/news_main.json','r') as f:
+        score = json.load(f)
+    
+    return score[ticker]
 
 def split_df(df):
     '''

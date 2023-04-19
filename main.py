@@ -7,50 +7,71 @@ import portfol_funcs as port
 import admin_func as admin
 
 # ======================== NUMERIC ==============================
-import tensorFinance as tf
-import predict_numeric as pn
+def numeric_predict(symbs):
+    import tensorFinance as tf
+    import predict_numeric as pn
 
-data = admin.CSV_to_DATA('AAPL')
+    data = admin.CSV_to_DATA('AAPL')
 
-week_Price = np.array(data['Weekly_Price'])
+    week_Price = np.array(data['Weekly_Price'])
 
-Plus_Min = pn.calculate_Puls_min(week_Price)
-non_tens_acc , non_tensor_predict = pn.predict(data,Plus_Min)
+    Plus_Min = pn.calculate_Puls_min(week_Price)
+    non_tens_acc , non_tensor_predict = pn.predict(data,Plus_Min)
 
-tens_acc , tensor_predict = tf.tensor_main(data,Plus_Min)
+    tens_acc , tensor_predict = tf.tensor_main(data,Plus_Min)
 
-print(non_tens_acc,non_tensor_predict[0])
-print(tens_acc ,tensor_predict[0])
+    print(non_tens_acc,non_tensor_predict[0])
+    print(tens_acc ,tensor_predict[0])
 
 # ======================== NEWS =================================
+def news_main(symbs):
+    with open('json_files/news_main.json', 'r') as f:
+        curr_news_scores = json.load(f)
 
-with open('json_files/news_main.json', 'r') as f:
-    curr_news_scores = json.load(f)
- 
-symbols = ['AAPL']
-for sym in symbols:
-    news_data = news.call(sym)
-    curr_news_scores = news.score(news_data,curr_news_scores)
-    time.sleep(5)
+    for sym in symbs:
+        news_data = news.call(sym)
+        if news_data != None:
+            curr_news_scores = news.score(news_data,curr_news_scores)
+        else:
+            print('something when wrong with Call, make sure symbols are correct')
+            return
+        time.sleep(5)
 
+    tops,curr_news_scores = news.tops(curr_news_scores,5)
 
-
-with open('json_files/news_main.json', 'w') as f:
-    json.dump(curr_news_scores, f)
-
-
-
-
-tops = news.tops(curr_news_scores,5)
-
-print(tops)
-
-with open('json_files/port.json', 'r') as f:
-    portfol = json.load(f)
-
-port.news_check(curr_news_scores,portfol)
+    with open('json_files/news_main.json', 'w') as f:
+        json.dump(curr_news_scores, f)
 
 
+    print(tops)
+
+    with open('json_files/port.json', 'r') as f:
+        portfol = json.load(f)
+    
+
+    port.news_check(curr_news_scores,portfol)
+
+    check = input('update portfolio (Y/N)? ')
+    if check == 'Y':
+        port.update_port(curr_news_scores)
+    
+
+
+
+symbols = ['APPF','AMD']
+
+user = input('News (N), Numeric (P), Search scores (S), Reset News (R) : ')
+
+if user == 'N':
+    news_main(symbols)
+elif user == 'P':
+    numeric_predict(symbols)
+elif user == 'S':
+    admin.search_news_scores(input('Ticker: '))
+elif user == 'R':
+    news.reset_news_scores()
+else:
+    print("end")
 
 """
 SET UP TEST DATA    

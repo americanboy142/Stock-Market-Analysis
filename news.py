@@ -5,7 +5,6 @@ def news_to_dict(data):
     """
     
     dict = {}
-
     for j in range(len(data["feed"])):
 
         date = data['feed'][j]['time_published'][:8]
@@ -22,9 +21,9 @@ def news_to_dict(data):
                 dict[curr_tick][date] = [{key: data['feed'][j]['ticker_sentiment'][i][key] for key in data['feed'][j]['ticker_sentiment'][i] if key != 'ticker'}]
             else:
                 dict[curr_tick][date].append({key: data['feed'][j]['ticker_sentiment'][i][key] for key in data['feed'][j]['ticker_sentiment'][i] if key != 'ticker'})
+            return dict
 
-
-    return dict
+    
 
 
 def score(data,news_scores={}):
@@ -83,7 +82,7 @@ def call(symb):
 def tops(data,n):
     '''
         using the dictinary from scores call
-        returns the top n scores, i.e. highest bull prediction
+        returns the top n scores and sorted scores, i.e. highest bull prediction
     '''
     import itertools as it
 
@@ -92,4 +91,9 @@ def tops(data,n):
         n = len(sorted_data_dict)-1
     best_n = dict(it.islice(sorted_data_dict.items(),n))
 
-    return best_n
+    return best_n, sorted_data_dict
+
+def reset_news_scores():
+    import json
+    with open('json_files/news_main.json','w') as f:
+        json.dump({},f)
