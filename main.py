@@ -36,6 +36,7 @@ def news_main(symbs):
         if news_data != None:
             curr_news_scores = news.score(news_data,curr_news_scores)
             print(f'RUNNING: {sym}')
+            print("Score:",curr_news_scores[sym])
         else:
             print('something when wrong with Call, make sure symbols are correct')
             return
@@ -47,7 +48,7 @@ def news_main(symbs):
     # wirtes the calculated and sorted scores to news_scores.json
     news.WRITE_NEWS(curr_news_scores)
 
-    print(tops)
+    print("Top Scores:", tops)
 
     curr_portfolio = port.EDIT_PORTFOLIO('r')
 
@@ -55,6 +56,7 @@ def news_main(symbs):
 
     check = input('update portfolio (Y/N)? ')
     if check == 'Y':
+        print("Current Portfolio:",curr_portfolio)
         user = input("Add changes in the form\n=== <ticker>:B/S; === \n")
         updated_port = port.update_port(curr_news_scores,curr_portfolio,user)
         port.EDIT_PORTFOLIO('w',updated_port)
@@ -64,7 +66,7 @@ def news_main(symbs):
 
 
 
-symbols = ['APPF','AMD',"VZ","KO"]
+symbols = ['APPF','AMD',"VZ","SPLK"]
 
 user = input('News (N), Numeric (P), Search scores (S), Reset News (R) : ')
 
