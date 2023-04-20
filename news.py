@@ -21,10 +21,18 @@ def news_to_dict(data):
                 dict[curr_tick][date] = [{key: data['feed'][j]['ticker_sentiment'][i][key] for key in data['feed'][j]['ticker_sentiment'][i] if key != 'ticker'}]
             else:
                 dict[curr_tick][date].append({key: data['feed'][j]['ticker_sentiment'][i][key] for key in data['feed'][j]['ticker_sentiment'][i] if key != 'ticker'})
-            return dict
+    return dict
 
     
+def GET_HISTORIC_NEWS_SCORES():
+    from json import load
+    with open('json_files/news_scores.json', 'r') as f:
+        return load(f)
 
+def WRITE_NEWS(scores):
+    from json import dump
+    with open('json_files/news_scores.json', 'w') as f:
+        dump(scores, f)
 
 def score(data,news_scores={}):
     '''
@@ -42,7 +50,7 @@ def score(data,news_scores={}):
     for symb in News:
         
         News_df = pd.DataFrame()
-        #print(len(News[symb]))
+
         length = sum(len(News[symb][date]) for date in News[symb])
 
         if length > 2:
@@ -52,9 +60,7 @@ def score(data,news_scores={}):
                 temp.insert(0,'dates',dates)
                 News_df = pd.concat([News_df,temp])
 
-            #ticker_lable = np.array(News_df['ticker_sentiment_label'])
             ticker_score = np.array(News_df['ticker_sentiment_score']).astype(float)
-
 
             score_avg = sum(ticker_score)/len(News_df['ticker_sentiment_score'])
             if symb not in news_scores:

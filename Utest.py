@@ -5,6 +5,7 @@ import news
 import pandas as pd
 import numpy as np
 import json
+import portfol_funcs as pf
 
 class Test(unittest.TestCase):
     @classmethod
@@ -38,7 +39,7 @@ class Test(unittest.TestCase):
     
     def test_News_to_dict(self):
         news_to_dict = news.news_to_dict(self.test_news)
-        self.assertEquals(type(news_to_dict), dict)
+        self.assertIsInstance(news_to_dict, dict, "did not return a dict")
     
     """ def between(num):s
         return true if between 0 - 1
@@ -53,14 +54,24 @@ class Test(unittest.TestCase):
     def test_News_scores(self):
         # news scores test
         news_scores = news.score(self.test_news)
-        self.assertEquals(type(news_scores), dict)
+        self.assertIsInstance(news_scores, dict,"scores are not the correct type")
 
         # news tops test
         news_tops = news.tops(self.test_news_scores,5)
-        self.assertEquals(type(news_tops), tuple)
+        self.assertIsInstance(news_tops, tuple,"tops is not the correct type")
 
 
-    
+    def test_portfolio_functions(self):
+        test_port = {'AAPL':2.0, 'AAPF':3.10, 'SPLK':1.0}
+
+        test_inputs = ['VZ:s', 'VZ:b','VZ:B;AAPL:s;AAPF:S;KO:B','VZ:h','VZ :s','VZ: s']
+
+        for i in test_inputs:
+            clean = pf.clean_user_input_portfolio(i)
+            self.assertIsInstance(clean,dict,'clean did not return a dictionary')
+
+            updated_port = pf.update_port(self.test_news_scores,test_port,i)
+            self.assertIsInstance(updated_port,dict,'updated port did not return a dictionary')
     
 
 

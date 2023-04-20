@@ -25,40 +25,46 @@ def numeric_predict(symbs):
 
 # ======================== NEWS =================================
 def news_main(symbs):
-    with open('json_files/news_main.json', 'r') as f:
-        curr_news_scores = json.load(f)
+    '''main news does not return anything'''
 
+    # gets previusly ran news scores
+    curr_news_scores = news.GET_HISTORIC_NEWS_SCORES()
+
+    # loop through the given symbols and calls each symbole and retievs scores
     for sym in symbs:
         news_data = news.call(sym)
         if news_data != None:
             curr_news_scores = news.score(news_data,curr_news_scores)
+            print(f'RUNNING: {sym}')
         else:
             print('something when wrong with Call, make sure symbols are correct')
             return
         time.sleep(5)
 
+    # sorts and graps top n scores
     tops,curr_news_scores = news.tops(curr_news_scores,5)
 
-    with open('json_files/news_main.json', 'w') as f:
-        json.dump(curr_news_scores, f)
-
+    # wirtes the calculated and sorted scores to news_scores.json
+    news.WRITE_NEWS(curr_news_scores)
 
     print(tops)
 
-    with open('json_files/port.json', 'r') as f:
-        portfol = json.load(f)
-    
+    curr_portfolio = port.EDIT_PORTFOLIO('r')
 
-    port.news_check(curr_news_scores,portfol)
+    port.news_check(curr_news_scores,curr_portfolio)
 
     check = input('update portfolio (Y/N)? ')
     if check == 'Y':
-        port.update_port(curr_news_scores)
+        user = input("Add changes in the form\n=== <ticker>:B/S; === \n")
+        updated_port = port.update_port(curr_news_scores,curr_portfolio,user)
+        port.EDIT_PORTFOLIO('w',updated_port)
+    else:
+        return
     
 
 
 
-symbols = ['APPF','AMD']
+symbols = ['APPF','AMD',"VZ","KO"]
 
 user = input('News (N), Numeric (P), Search scores (S), Reset News (R) : ')
 
