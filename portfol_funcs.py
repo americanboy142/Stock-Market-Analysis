@@ -2,12 +2,14 @@ def news_check(data,port):
     print("============================ PORTFOLIO CHECK =============================")
     for i in port:
         if i in data:
-            print("Percentage change for",i, (data[i]-port[i])/port[i])
+            if port[i] != None:
+                print("Percentage change for",i, (data[i]-port[i])/port[i])
+            else:
+                print(f"No original score for {i}") 
             print(i,'score:',data[i])
         else:
             print(f"{i} Not in News")
     print("===========================================================================")
-
 
 def EDIT_PORTFOLIO(option:str,port:dict = None) -> dict:
     """
@@ -41,36 +43,29 @@ def clean_user_input_portfolio(input:str) -> str:
         if input[-1] == ';':
             input = input[:-1]
         for i in input.split(';'):
-            ticker_dict[i.split(':')[0]] = i.split(':')[1]
+            ticker_dict[i.split(':')[0].upper()] = i.split(':')[1].lower()
     else:
-        ticker_dict[input.split(':')[0]] = input.split(':')[1]
+        ticker_dict[input.split(':')[0].upper()] = input.split(':')[1].lower()
     return ticker_dict
     
-
-
 def update_port(scores:dict,port:dict,input:str) -> dict:
     """
     returns an updated portfolio given (scores, old portfolio, user input)
     """
     #tick = input("Add changes in the form\n=== <ticker>:B/S; === \n")
     ticks = []
-    """ if ';' in input:
-        if input[-1] == ';':
-            input = input[:-1]
-        for i in input.split(';'):
-            input.append(i) """
     
     ticks = clean_user_input_portfolio(input)
 
     # ticks = {<ticker>:(B/S),...}
     for key in ticks:
-        #ticker,option = tuple(el.split(':'))
-        if  ticks[key].lower() == 'b':
+        if  ticks[key] == 'b':
             if key in scores:
                 port[key] = scores[key]
             else:
-                print(f"ERROR: {key} not found in scores")
-        elif ticks[key].lower() == 's':
+                port[key] = None
+                print(f"{key} not found in scores, set to NONE")
+        elif ticks[key] == 's':
             if key in port:
                 del port[key]
             else:
@@ -79,7 +74,6 @@ def update_port(scores:dict,port:dict,input:str) -> dict:
             print(f'Error: Unknown option for {key}')
     return port
     #EDIT_PORTFOLIO('w',port)
-
 
 if __name__ == '__main__':
     import json 

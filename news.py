@@ -1,5 +1,5 @@
 
-def news_to_dict(data):
+def news_to_dict(data) -> dict:
     """
         Given a news api response as is will return updated dictionary, with most current news.
     """
@@ -22,8 +22,7 @@ def news_to_dict(data):
             else:
                 dict[curr_tick][date].append({key: data['feed'][j]['ticker_sentiment'][i][key] for key in data['feed'][j]['ticker_sentiment'][i] if key != 'ticker'})
     return dict
-
-    
+ 
 def GET_HISTORIC_NEWS_SCORES():
     from json import load
     with open('json_files/news_scores.json', 'r') as f:
@@ -34,7 +33,7 @@ def WRITE_NEWS(scores):
     with open('json_files/news_scores.json', 'w') as f:
         dump(scores, f)
 
-def score(data,news_scores={}):
+def score(data,news_scores={}) -> dict:
     '''
         return the bear/bull scores of given raw news data
         -1 => bear , 0 => nothing , 1 => bull
@@ -71,7 +70,6 @@ def score(data,news_scores={}):
 
     return(news_scores)
 
-
 def call(symb):
     import key
     '''
@@ -81,11 +79,9 @@ def call(symb):
     import requests
 
     url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={symb}&apikey={key.API_KEY}'
-    r = requests.get(url)
-    return r.json()
+    return requests.get(url).json()
 
-
-def tops(data,n):
+def tops(data:dict,n:int) -> tuple:
     '''
         using the dictinary from scores call
         returns the top n scores and sorted scores, i.e. highest bull prediction
