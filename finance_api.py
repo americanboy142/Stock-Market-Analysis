@@ -1,73 +1,70 @@
-from operator import index
 from time import sleep
-from typing import DefaultDict
 import requests
-import numpy as np
 import pandas as pd
 from admin_func import GET_SYMBOLS
 import key
-import csv
-import time
+import numpy as np
 
-nasdq_symbol = GET_SYMBOLS
+# move to calulations want to only call daily price
 
-print("Main Loop Started")
+#EMA = 2/(timeperiods+1)(current_price - prev_ema) + prev_ema
+# timeperiods would be number of days between calculation
+# so long might be 50days and short could be 15 days
 
-count = 0
-for i,symbol in enumerate(nasdq_symbol):
+
+# RSI = 100 – 100 / ( 1 + RS)
+# RS = avgU / avgD
+# avgU = SUM of all gains over the time period / timeperiod === 0 if no gain
+# avgD = SUM of all losses over the time period / timeperiod ==== 100 if no loss
+
+
+
+
+#nasdq_symbol = GET_SYMBOLS
+
+def numeric_build(symbol:str):
     # call for short moving average
-    url_EMA_Short = f'https://www.alphavantage.co/query?function=EMA&symbol={symbol}&interval=daily&time_period=15&series_type=open&apikey={key.API_KEY}'
-    r = requests.get(url_EMA_Short)
+    r = requests.get(f'https://www.alphavantage.co/query?function=EMA&symbol={symbol}&interval=weekly&time_period=15&series_type=open&apikey={key.API_KEY}')
     data_EMA_Short = r.json()
+    EMA_Short = np.array([vals["EMA"] for vals in data_EMA_Short["Technical Analysis: EMA"].values()])
 
     # call for long moving average
-    url_EMA_Long = f'https://www.alphavantage.co/query?function=EMA&symbol={symbol}&interval=daily&time_period=50&series_type=open&apikey={key.API_KEY}'
-    r = requests.get(url_EMA_Long)
+    r = requests.get(f'https://www.alphavantage.co/query?function=EMA&symbol={symbol}&interval=weekly&time_period=50&series_type=open&apikey={key.API_KEY}')
     data_EMA_Long = r.json()
+    EMA_long = np.array([vals["EMA"] for vals in data_EMA_Long["Technical Analysis: EMA"].values()])
 
     #call for RSI
-    url_RSI = f'https://www.alphavantage.co/query?function=RSI&symbol={symbol}&interval=daily&time_period=10&series_type=open&apikey={key.API_KEY}'
-    r = requests.get(url_RSI)
+    r = requests.get(f'https://www.alphavantage.co/query?function=RSI&symbol={symbol}&interval=weekly&time_period=10&series_type=open&apikey={key.API_KEY}')
     data_RSI = r.json()
+    RSI = np.array([vals["RSI"] for vals in data_RSI["Technical Analysis: RSI"].values()])
 
     #call for OBV
-    url_OBV = f'https://www.alphavantage.co/query?function=OBV&symbol={symbol}&interval=daily&apikey={key.API_KEY}'
-    r = requests.get(url_OBV)
+    r = requests.get(f'https://www.alphavantage.co/query?function=OBV&symbol={symbol}&interval=weekly&apikey={key.API_KEY}')
     data_OBV = r.json()
+    OBV = np.array([vals["OBV"] for vals in data_OBV["Technical Analysis: OBV"].values()])
 
     #call for Weekly adjusted
-    url_Week = f'https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY_ADJUSTED&symbol={symbol}&apikey={key.API_KEY}'
-    r = requests.get(url_Week)
+    r = requests.get(f'https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY_ADJUSTED&symbol={symbol}&apikey={key.API_KEY}')
     data_Week = r.json()
+    Weekly_price = np.array([vals["5. adjusted close"] for vals in data_Week["Weekly Adjusted Time Series"].values()])
 
-    # Will stop loop if api call fails
-    try:
-        unsorted_data = [data_EMA_Short["Technical Analysis: EMA"], 
-                     data_EMA_Long["Technical Analysis: EMA"], 
-                     data_RSI["Technical Analysis: RSI"],
-                     data_OBV["Technical Analysis: OBV"], 
-                     data_Week["Weekly Adjusted Time Series"]
-                     ]
-    except :
-        break
+    if not Weekly_price:
+        raise Exception('Call Failed')
+ 
+    shortest_data = min(len(EMA_Short),
+                        len(EMA_long),
+                        len(RSI),
+                        len(OBV),
+                        len(Weekly_price))
+
+    Main_Array = np.array([EMA_Short],
+                        [EMA_long],
+                        [RSI],
+                        [OBV],
+                        [Weekly_price])
     
-    Data_sub = [ "EMA", "EMA",
-                 "RSI", "OBV",
-                 "5. adjusted close"
-                 ]
-    shortest_data = min(len(data_EMA_Short["Technical Analysis: EMA"]),
-                        len(data_EMA_Long["Technical Analysis: EMA"]),
-                        len(data_RSI["Technical Analysis: RSI"]),
-                        len(data_OBV["Technical Analysis: OBV"]),
-                        len(data_Week["Weekly Adjusted Time Series"])
-                            )
-    Longest_data = max(len(data_EMA_Short["Technical Analysis: EMA"]),
-                        len(data_EMA_Long["Technical Analysis: EMA"]),
-                        len(data_RSI["Technical Analysis: RSI"]),
-                        len(data_OBV["Technical Analysis: OBV"]),
-                        len(data_Week["Weekly Adjusted Time Series"])
-                            )
-
+    for i in Main_Array:
+        i = i[:shortest_data]
 
     # fill the matrix with values
     #{
@@ -78,53 +75,22 @@ for i,symbol in enumerate(nasdq_symbol):
     # (4) Adjusted Close
     #}
 
-    EMA_short_sorted = []
-    EMA_long_sorted = []
-    RSI_sorted = []
-    OBV_sorted =[]
-    MACD_sorted =[]
-    Weekly_sorted =[] 
-    
-    sorted_data = [EMA_short_sorted, EMA_long_sorted, RSI_sorted, OBV_sorted, Weekly_sorted, MACD_sorted] # list of list of values
-
-
-    # this loop fills all the sorted lists with api values for each of the sybols
-    for i in range(5): # loops length of list of unsored data, IE for i in 5
-        for points in unsorted_data[i]: # loops though each point in unsorted data
-            sorted_data[i].append(unsorted_data[i][points][Data_sub[i]]) # values are put into each of the sorted lists
-    
-    # trouble shoots incase a api list is shorter then another   
-    # makes all lists equal size by removing values from lists that are longer then the shortest one                   
-    for datas in sorted_data:
-        for i in range(len(datas)-shortest_data):
-            datas.pop()
-
-    for i in range(len(sorted_data[0])):
-        #short-long
-        #short = EMA_short_sorted
-        #long = EMA_long_sorted
-        MACD_sorted.append(float(EMA_short_sorted[i]) - float(EMA_long_sorted[i]))
-    
     # creats a dictionary for the current symbols data
     # will be changed every itereation
-    Historical_Current_dct = {"EMA Short" : EMA_short_sorted,
-                              "EMA Long": EMA_long_sorted, 
-                              "RSI": RSI_sorted,
-                              "OBV": OBV_sorted,
-                              "MACD": MACD_sorted,
-                              "Weekly Price": Weekly_sorted}
+    Historical_Current_dct = {"EMA Short" : EMA_Short,
+                              "EMA Long": EMA_long, 
+                              "RSI": RSI,
+                              "OBV": OBV,
+                              "Weekly Price": Weekly_price}
 
     Historica_current_df = pd.DataFrame(Historical_Current_dct)
 
     # df was 1 row with crazy columns
     Historica_current_df.to_csv(f'csv_files/{symbol}.csv',index=False)
     print(f"{symbol} has been filled")
-    count+=1
-    print(f"{50-count} remaining")
     print("===========================================")
-    print("===========================================")
-    break
-    sleep(61)
+
+numeric_build('AAPL')
 
 # all historical csvs created and filled 
 

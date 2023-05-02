@@ -1,6 +1,5 @@
 import unittest
 import predict_numeric as pn
-import tensorFinance as tf
 import news
 import pandas as pd
 import numpy as np
