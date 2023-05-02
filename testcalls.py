@@ -2,7 +2,9 @@ import key
 import json
 import requests
 import numpy as np
+import matplotlib.pyplot as plt
 # json=2.0.9
+
 
 symbol = 'AAPL'
 
@@ -72,40 +74,67 @@ def RSI_calc(daily_gain_loss):
 
 def EMA_calc(data:dict):
     daily_price = np.array([float(val["5. adjusted close"]) for val in data["Time Series (Daily)"].values()])
-    curr_price = daily_price[-1]
 
     interval_short = 15
     interval_long = 60
     k_short = 2/(interval_short + 1)
     k_long = 2/(interval_long + 1)
 
+    daily_price = daily_price[::-1]
     
     '''
-        gets first EMA using SMA so rest of EMAs can be calculated
+        gets first EMA using SMA so rest of EMAs can be calculated using normal formula
     '''
-    curr_EMA_short = k_short * (curr_price - sum(daily_price[:interval_short])) + sum(daily_price[:interval_short])
-    curr_EMA_long = k_long * (curr_price - sum(daily_price[:interval_long])) + sum(daily_price[:interval_long])
+    curr_EMA_short = np.mean(daily_price[:interval_short])
+    curr_EMA_long = np.mean(daily_price[:interval_long])
 
-    EMA_short_vec = np.zeros(len(daily_price))
-    EMA_long_vec = np.zeros(len(daily_price))
 
+    '''
+        initialize arrays win None set to float so it can be filled properly 
+    '''
+    EMA_short_vec = np.full(len(daily_price), None, dtype= float)
+    EMA_long_vec = np.full(len(daily_price), None, dtype= float)
+
+    #EMA_short_vec[interval_short] = curr_EMA_short
+    
     ''' 
-        loop through rest of daily prices starting at 1 since [0] is caluclated
-        and calculates EMA, short/long, for each
+        main loop to calculate respecitve emas
+        starts at long interval
     '''
-    for i in range(1,len(daily_price)):
+    for i in range(interval_long, len(daily_price)):
         EMA_short_vec[i] = curr_EMA_short
         EMA_long_vec[i] = curr_EMA_long
-        curr_EMA_short = k_short * (curr_price - curr_EMA_short) + curr_EMA_short
-        curr_EMA_long = k_long * (curr_price - curr_EMA_long) + curr_EMA_long
+        curr_EMA_short = k_short * (daily_price[i] - curr_EMA_short) + curr_EMA_short
+        curr_EMA_long = k_long * (daily_price[i] - curr_EMA_long) + curr_EMA_long
+
+    # removes all None values from arrays then returns
+    return EMA_short_vec[~np.isnan(EMA_short_vec)] , EMA_long_vec[~np.isnan(EMA_long_vec)], daily_price
 
 
-    return EMA_long_vec,EMA_short_vec
+EMA_short,EMA_long, price = EMA_calc(data)
 
+#print(EMA_long[1:10])
+n = len(EMA_long)
 
-EMA_long,EMA_short = EMA_calc(data)
+EMA_long = EMA_long[1:n]
+#print(EMA_long[0])
 
-print(EMA_long[-3:])
+#x = range(len(EMA_long))
+x = range(200)
+
+#print(len(EMA_short[:len(EMA_long)]))
+
+'''plt.plot(x,EMA_long)
+plt.plot(x,EMA_short[:len(EMA_long)])
+plt.plot(x,price[:len(EMA_long)])
+plt.legend(['EMA long','EMA short','price'])
+plt.show()'''
+
+plt.plot(x,EMA_long[:200])
+plt.plot(x,EMA_short[:200])
+plt.plot(x,price[:200])
+plt.legend(['EMA long','EMA short','price'])
+plt.show()
 
 #data["Time Series (Daily)"]
 
@@ -114,3 +143,4 @@ print(EMA_long[-3:])
 
 #print(OBV.shape)
 #print(len(OBV))
+
