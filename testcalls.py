@@ -31,7 +31,7 @@ def calc_daly_gain_loss(data:dict):
 
     return close - open
 
-#dif = calc_daly_gain_loss(data)
+dif = calc_daly_gain_loss(data)
 
 #print(dif[4:10])
 # RSI = 100 – 100 / ( 1 + RS)
@@ -56,15 +56,15 @@ def RSI_calc(daily_gain_loss):
 
     for i in range(len(daily_gain_loss)):
         RS_arr[i] = RS(daily_gain_loss[i:i+interval])
-
-    return  100 - 100 / ( 1 + RS_arr) 
+    RS_arr = RS_arr[::-1]
+    return  100-100/( 1 + RS_arr) 
 
 '''
     NEEDS TO BE REVERED
 '''
 
-#RSI = RSI_calc(dif)
-
+RSI = RSI_calc(dif)
+#RSI = RSI
 #print(RSI[-3:])
 
 
@@ -130,10 +130,11 @@ plt.plot(x,price[:len(EMA_long)])
 plt.legend(['EMA long','EMA short','price'])
 plt.show()'''
 
-plt.plot(x,EMA_long[:200])
-plt.plot(x,EMA_short[:200])
-plt.plot(x,price[:200])
-plt.legend(['EMA long','EMA short','price'])
+plt.plot(x,EMA_long[-200:])
+plt.plot(x,EMA_short[-200:])
+plt.plot(x,price[-200:])
+plt.plot(x,RSI[-200:])
+plt.legend(['EMA long','EMA short','price', 'RSI'])
 plt.show()
 
 #data["Time Series (Daily)"]
