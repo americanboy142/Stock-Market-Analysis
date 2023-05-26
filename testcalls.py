@@ -59,11 +59,12 @@ def RSI_calc(daily_gain_loss):
     RS_arr = RS_arr[::-1]
     return  100-100/( 1 + RS_arr) 
 
-'''
-    NEEDS TO BE REVERED
-'''
+
 
 RSI = RSI_calc(dif)
+
+
+
 #RSI = RSI
 #print(RSI[-3:])
 
@@ -110,6 +111,21 @@ def EMA_calc(data:dict):
     # removes all None values from arrays then returns
     return EMA_short_vec[~np.isnan(EMA_short_vec)] , EMA_long_vec[~np.isnan(EMA_long_vec)], daily_price
 
+def OBV_calc(data):
+    daily_price,daily_volume = np.array([(float(val["5. adjusted close"]),float(val["6. volume"])) for val in data["Time Series (Daily)"].values()])[::-1].T
+    #daily_volume = np.array([float(val["6. volume"]) for val in data["Time Series (Daily)"].values()])
+
+    daily_compar = np.where(daily_price[:-1]<daily_price[1:], -1, np.where(daily_price[:-1]>daily_price[1:],1,0))
+
+    adjsted_volumes = daily_volume[:-1] * daily_compar
+
+    return np.cumsum(adjsted_volumes[::-1])[::-1]
+
+
+
+
+OBV = OBV_calc(data)
+#print(OBV)
 
 EMA_short,EMA_long, price = EMA_calc(data)
 
@@ -134,7 +150,7 @@ plt.plot(x,EMA_long[-200:])
 plt.plot(x,EMA_short[-200:])
 plt.plot(x,price[-200:])
 plt.plot(x,RSI[-200:])
-plt.legend(['EMA long','EMA short','price', 'RSI'])
+plt.legend(['EMA long','EMA short','price', 'RSI', 'OBV'])
 plt.show()
 
 #data["Time Series (Daily)"]

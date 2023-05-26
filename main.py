@@ -5,23 +5,25 @@ import time
 import json
 import portfol_funcs as port
 import admin_func as admin
+import build as build
 
 # ======================== NUMERIC ==============================
 def numeric_predict(symbs):
     import tensorFinance as tf
     import predict_numeric as pn
 
-    data = admin.CSV_to_DATA('AAPL')
+    for symb in symbs:
+        data = build.Build_Admin(symb).Build()
 
-    week_Price = np.array(data['Weekly_Price'])
+        Daily_Price = np.array(data['Daily Price'])
 
-    Plus_Min = pn.calculate_Puls_min(week_Price)
-    non_tens_acc , non_tensor_predict = pn.predict(data,Plus_Min)
+        Plus_Min = pn.calculate_Puls_min(Daily_Price)
+        non_tens_acc , non_tensor_predict = pn.predict(data,Plus_Min)
 
-    tens_acc , tensor_predict = tf.tensor_main(data,Plus_Min)
+        tens_acc , tensor_predict = tf.tensor_main(data,Plus_Min)
 
-    print(non_tens_acc,non_tensor_predict[0])
-    print(tens_acc ,tensor_predict[0])
+        print(non_tens_acc,non_tensor_predict[0])
+        print(tens_acc ,tensor_predict[0])
 
 # ======================== NEWS =================================
 def news_main(symbs):
